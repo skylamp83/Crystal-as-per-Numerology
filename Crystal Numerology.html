@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Numerology-Based Crystal Bracelet Suggestion</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 40px; }
+    form { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 15px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    button { margin-top: 20px; padding: 10px 15px; background: #333; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    #result { margin-top: 30px; background: #e0f7fa; padding: 15px; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <form id="crystalForm">
+    <h2>Crystal Bracelet Suggestion</h2>
+    <label for="dob">Date of Birth (DD-MM-YYYY):</label>
+    <input type="text" id="dob" required>
+    <label for="name">First Name:</label>
+    <input type="text" id="name" required>
+    <button type="submit">Get Suggested Crystals</button>
+    <div id="result"></div>
+  </form>  <script>
+    const crystalMap = {
+      1: ['Ruby', 'Sunstone', 'Carnelian'],
+      2: ['Moonstone', 'Pearl', 'Selenite'],
+      3: ['Yellow Sapphire', 'Lapis Lazuli', 'Amethyst'],
+      4: ['Hessonite (Gomed)', 'Smoky Quartz', 'Black Tourmaline'],
+      5: ['Emerald', 'Peridot', 'Fluorite'],
+      6: ['Diamond', 'Rose Quartz', 'Rhodonite'],
+      7: ['Cat’s Eye', 'Labradorite', 'Iolite'],
+      8: ['Blue Sapphire', 'Onyx', 'Black Tourmaline'],
+      9: ['Red Coral', 'Garnet', 'Carnelian']
+    };
+
+    const chaldeanMap = {
+      A: 1, I: 1, J: 1, Q: 1, Y: 1,
+      B: 2, K: 2, R: 2,
+      C: 3, G: 3, L: 3, S: 3,
+      D: 4, M: 4, T: 4,
+      E: 5, H: 5, N: 5, X: 5,
+      U: 6, V: 6, W: 6,
+      O: 7, Z: 7,
+      F: 8, P: 8
+    };
+
+    function reduceNumber(n) {
+      while (n > 9 && ![11, 22, 33].includes(n)) {
+        n = n.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+      }
+      return n;
+    }
+
+    function getBirthNumber(day) {
+      return reduceNumber(day);
+    }
+
+    function getLifePathNumber(dob) {
+      const parts = dob.split('-').map(Number);
+      const total = parts.map(p => p.toString().split('').reduce((a, b) => a + parseInt(b), 0)).reduce((a, b) => a + b, 0);
+      return reduceNumber(total);
+    }
+
+    function getNameNumber(name) {
+      let total = 0;
+      name.toUpperCase().split('').forEach(c => {
+        if (chaldeanMap[c]) total += chaldeanMap[c];
+      });
+      return reduceNumber(total);
+    }
+
+    function suggestCrystals(numbers) {
+      const all = new Set(['Clear Quartz', 'Selenite']);
+      numbers.forEach(num => {
+        (crystalMap[num] || []).forEach(crystal => all.add(crystal));
+      });
+      return Array.from(all);
+    }
+
+    document.getElementById('crystalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const dob = document.getElementById('dob').value;
+      const name = document.getElementById('name').value;
+      const day = parseInt(dob.split('-')[0]);
+      const birth = getBirthNumber(day);
+      const life = getLifePathNumber(dob);
+      const nameNum = getNameNumber(name);
+      const crystals = suggestCrystals([birth, life, nameNum]);
+      document.getElementById('result').innerHTML = `
+        <strong>Birth Number:</strong> ${birth}<br>
+        <strong>Life Path Number:</strong> ${life}<br>
+        <strong>Name Number:</strong> ${nameNum}<br><br>
+        <strong>Suggested Crystals:</strong><br>${crystals.join(', ')}`;
+    });
+  </script></body>
+</html>
